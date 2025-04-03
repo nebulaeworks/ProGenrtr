@@ -34,3 +34,12 @@ class App:
         """
         if args["--list"]:
             ProjectTypesList().run(args)
+        elif args["<PROJECT_TYPE>"]:
+            ProjectGenerator().run(args)
+
+
+###############################################################################
+if __name__ == "__main__":
+    app = App()
+    app.run()
+###############################################################################
