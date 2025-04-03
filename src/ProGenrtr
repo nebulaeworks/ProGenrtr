@@ -17,6 +17,7 @@ class App:
         """
         args = docopt(USAGE, version=VERSION)
         self.__initConfig(args)
+        self.__dispatchCommandLineArgs(args)
 
     def __initConfig(self, args: dict):
         """!
@@ -25,3 +26,11 @@ class App:
         """
         cfg = ConfMgr()
         cfg.parse(args)
+
+    def __dispatchCommandLineArgs(self, args:dict):
+        """!
+        fan out execution to the appropriate class based on the arguments
+        passed at the command line.
+        """
+        if args["--list"]:
+            ProjectTypesList().run(args)
