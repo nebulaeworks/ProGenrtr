@@ -1,5 +1,5 @@
 import configparser
-import sys
+from pathlib import Path
 
 FALLBACK_CONFIG = "templates/fallback.ini"
 
@@ -16,7 +16,7 @@ class ConfigStruct:
     def get(self, attr: str):
         try:
             return getattr(self, attr)
-        except AttributeError: # this should probably be elsewhere
+        except AttributeError:
             raise AttributeError(f"'{attr}' not found in config")
 
     def __getitem__(self, item: str):
@@ -35,6 +35,8 @@ def getConfig(path: str):
     @param path is the path to the ini style config file
     @returns parsed config object
     """
+    if not Path(path).exists():
+        raise FileNotFoundError(f"config file not found at '{path}'")
     data = configparser.ConfigParser()
     data._interpolation = configparser.ExtendedInterpolation()
     data.read(path)

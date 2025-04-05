@@ -1,6 +1,11 @@
+import sys
+import os
+import shutil
+
 from ConfigManager import ConfMgr as Conf
-import sys, os, shutil
+
 from git import Repo
+
 
 class ProjectGenerator:
     """!
@@ -14,7 +19,7 @@ class ProjectGenerator:
         """!
         Processes command line arguments to generate a new project based on
         specified language and project type templates.
-        
+
         @param args Dictionary containing command line arguments
                     Expected keys:
                     - <LANGUAGE>: Programming language of the template
@@ -36,10 +41,10 @@ class ProjectGenerator:
     def __cloneRepo(self, project: str, path: str):
         """!
         Clones the template repository to the target path
-        
+
         @param project string URL or path of the template repository to clone
         @param path string target directory where the repository will be cloned
-        
+
         @exception Exits the program if cloning fails
         """
         try:
@@ -51,16 +56,14 @@ class ProjectGenerator:
     def __cleanProject(self, path: str):
         """!
         Removes all Git-related files and directories from the cloned project
-        
+
         This ensures the generated project doesn't contain any Git history
         or configuration from the template repository.
-        
+
         @param path string representing path to the project directory to clean
         """
         git_path = os.path.join(path, ".git")
-        
-        # Remove the .git directory
-#        if os.path.exists(git_path):
+
         if os.path.exists(os.path.join(path, ".git")):
             shutil.rmtree(git_path)
             print(f"Removed: {git_path}")
@@ -77,15 +80,15 @@ class ProjectGenerator:
     def __reinitialiseProject(self, path: str):
         """!
         Initialize a fresh Git repository in the project directory
-        
+
         Creates a new Git repository with an initial empty commit to mark
         the beginning of the project history.
-        
+
         @param path string representing the path to the project directory to
                     initialize
-        
-        @note The repository is initialized with a 'master' branch and an empty commit
-              with the message "#===>[BEGIN]<===#"
+
+        @note The repository is initialized with a 'master' branch and an empty
+              commit with the message "#===>[BEGIN]<===#"
         """
         repo = Repo.init(path)
         print("Project Initialised")
