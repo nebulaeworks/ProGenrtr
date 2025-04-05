@@ -17,7 +17,7 @@ class ConfigStruct:
         try:
             return getattr(self, attr)
         except AttributeError: # this should probably be elsewhere
-            sys.exit(f"'{attr}' not available")
+            raise AttributeError(f"'{attr}' not found in config")
 
     def __getitem__(self, item: str):
         return self.get(item)
