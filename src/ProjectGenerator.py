@@ -24,7 +24,10 @@ class ProjectGenerator:
         langArg = args["<LANGUAGE>"]
         projectArg = args["<PROJECT_TYPE>"]
         path = args["<PROJECT_PATH>"]
-        project = Conf().projects.get(langArg).get(projectArg)
+        try:
+            project = Conf().projects.get(langArg).get(projectArg)
+        except AttributeError as e:
+            sys.exit("ERROR:" + str(e))
 
         self.__cloneRepo(project, path)
         self.__cleanProject(path)
@@ -42,8 +45,8 @@ class ProjectGenerator:
         try:
             Repo.clone_from(project, path)
         except Exception as e:
-            print("ERROR: could not clone project repo...")
-            sys.exit(e)
+            print(f"ERROR: could not clone project repo. {e}")
+            sys.exit(1)
 
     def __cleanProject(self, path: str):
         """!

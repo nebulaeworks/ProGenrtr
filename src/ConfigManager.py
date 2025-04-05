@@ -58,7 +58,10 @@ class ConfMgr(object):
         """
         for path in paths:
             if self.__configPathExists(path):
-                self.__parseConfFileSections(path)
+                try:
+                    self.__parseConfFileSections(path)
+                except Exception as e:
+                    sys.exit(e)
 
     def __configPathExists(self, path: str) -> bool:
         """!

@@ -1,4 +1,4 @@
-import pprint
+import pprint, sys
 from ConfigManager import ConfMgr as Config
 from Config import ConfigStruct
 
@@ -36,7 +36,10 @@ class ProjectTypesList:
                 print(f"- {language}")
                 self.__printProjects(entries)
         else:
-            self.__printProjects(Config().projects.get(lang))
+            try:
+                self.__printProjects(Config().projects.get(lang))
+            except AttributeError as e:
+                sys.exit("ERROR: Language " + str(e))
 
     def __printProjects(self, language: ConfigStruct):
         """!
