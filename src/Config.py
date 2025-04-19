@@ -1,8 +1,6 @@
 import configparser
 from pathlib import Path
 
-FALLBACK_CONFIG = "templates/fallback.ini"
-
 
 class ConfigStruct:
     """!
@@ -29,7 +27,7 @@ class ConfigStruct:
         return self.__str__()
 
 
-def getConfig(path: str):
+def getConfig(path: str) -> dict:
     """!
     read the config file and return the object as parsed by ConfigParser.
     @param path is the path to the ini style config file
