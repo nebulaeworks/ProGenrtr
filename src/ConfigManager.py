@@ -1,4 +1,5 @@
 from Config import getConfig, conf2obj, ConfigStruct
+from utils import PROJECT_ROOT
 from os.path import expanduser
 from pathlib import Path
 import sys
@@ -16,7 +17,7 @@ class ConfMgr(object):
     it will use the fallback config.
     """
 
-    __fallbackPath = "templates/fallback.ini"
+    __fallbackPath = f"{PROJECT_ROOT}/templates/fallback.ini"
 
     def __new__(cls):
         """!
@@ -30,38 +31,60 @@ class ConfMgr(object):
             cls.instance.args = ConfigStruct()
         return cls.instance
 
+    @classmethod
+    def reset(cls):
+        """!
+        de-initialises the ConfigManager
+        """
+        if hasattr(cls, "instance"):
+            del ConfMgr.instance
+
     def parse(self, args: dict):
         """!
         parse the config file at the path provided or if none is provided then
         use the fallback config.
-        @param confPath the path to the config file to parse.
+        @param args the dictionary of command line arguments
         @return none, sets internal projects state
         """
+        self.__exitIfFallbackConfigDoesNotExists()
+
         self.args = ConfigStruct(**args)  # decoupling or untestable?
+
         if self.args["--config"] is None:
-            print("WARNING: expected config not found using fallback!!")
-            self.__conf = conf2obj(getConfig(ConfMgr.__fallbackPath), "META")
-            self.__conf = self.__getConfFromList(
-                    self.__conf.cfgpaths.split(",")
-            )
-            if self.__conf is None:
-                self.__parseConfFileSections(ConfMgr.__fallbackPath)
+            cfgPaths = self.__getConfigLocationList()
+            self.projects = self.__getConfFromList(cfgPaths)
+
+            if self.projects is None:
+                print("WARNING: expected config not found using fallback!!")
+                self.projects = self.__parseConfFileSections(ConfMgr.__fallbackPath)
         else:
             self.__parseConfFileSections(self.args["--config"])
 
-    def __getConfFromList(self, paths: list[str]) -> ConfigStruct:
+    def __getConfigLocationList(self) -> list[str]:
+        """!
+        parse the `[META]` section of the fallback config to retrieve the
+        default locations at which config is expected to exist.
+
+        @return List[str] where each entry is a filesystem path
+        """
+        meta = conf2obj(getConfig(ConfMgr.__fallbackPath), "META")
+        return meta.cfgpaths.replace("\n", "").split(",")
+
+    def __getConfFromList(self, paths: list[str]) -> ConfigStruct | None:
         """!
         parses and returns the first config found in the list provided.
         @param paths, list of strings representing the possible places that
                that config files could exist at.
         @returns none. just parses the first config file found.
         """
-        for path in paths:
+        for location in paths:
+            path = expanduser(location)
             if self.__configPathExists(path):
                 try:
-                    self.__parseConfFileSections(path)
+                    return self.__parseConfFileSections(path)
                 except Exception as e:
                     sys.exit(e)
+        return None
 
     def __configPathExists(self, path: str) -> bool:
         """!
@@ -69,12 +92,12 @@ class ConfMgr(object):
         @param path string representation of a path to an ini style config
         @returns bool true iff path exists else false.
         """
-        if Path(expanduser(path)).is_file():
+        if Path(path).is_file():
             return True
         else:
             return False
 
-    def __parseConfFileSections(self, path: str) -> None:
+    def __parseConfFileSections(self, path: str) -> ConfigStruct:
         """!
         This needs to parse all sections: language section defines which other
         sections exist.
@@ -95,10 +118,21 @@ class ConfMgr(object):
         langs = conf2obj(config, section="ProGenrtr").languages.split(',')
         langs = [s.strip() for s in langs]  # Clean newline characters
         # Create a dictionary to hold ConfigStructs
-        projects = {}
+        projects = dict()
 
         for lang in langs:
             if f"project.{lang}" in config:
                 projects[lang] = conf2obj(config, section=f"project.{lang}")
 
-        self.projects = ConfigStruct(**projects)
+        return ConfigStruct(**projects)
+
+    def __exitIfFallbackConfigDoesNotExists(self) -> None:
+        """!
+        check for the existance of the fallback.ini config file, if its missing
+        exit with an appropriate status code
+        """
+        if Path(self.__fallbackPath).exists() is False:
+            print(
+                f"ERROR: necessary file '{self.__fallbackPath}' not available"
+            )
+            sys.exit(1)
