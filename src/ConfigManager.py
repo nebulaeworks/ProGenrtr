@@ -1,4 +1,4 @@
-from Config import getConfig, conf2obj, ConfigStruct
+from Config import getConfig, makeDataStruct, DataStruct
 from utils import PROJECT_ROOT
 from os.path import expanduser
 from pathlib import Path
@@ -27,8 +27,8 @@ class ConfMgr(object):
         """
         if not hasattr(cls, 'instance'):
             cls.instance = super(ConfMgr, cls).__new__(cls)
-            cls.instance.projects = ConfigStruct()
-            cls.instance.args = ConfigStruct()
+            cls.instance.projects = DataStruct()
+            cls.instance.args = DataStruct()
         return cls.instance
 
     @classmethod
@@ -46,19 +46,25 @@ class ConfMgr(object):
         @param args the dictionary of command line arguments
         @return none, sets internal projects state
         """
-        self.__exitIfFallbackConfigDoesNotExists()
+        try:
+            self.__exitIfFallbackConfigDoesNotExists()
 
-        self.args = ConfigStruct(**args)  # decoupling or untestable?
+            self.args = DataStruct(**args)  # decoupling or untestable?
 
-        if self.args["--config"] is None:
-            cfgPaths = self.__getConfigLocationList()
-            self.projects = self.__getConfFromList(cfgPaths)
+            if self.args["--config"] is None:
+                cfgPaths = self.__getConfigLocationList()
+                self.projects = self.__getConfFromList(cfgPaths)
 
-            if self.projects is None:
-                print("WARNING: expected config not found using fallback!!")
-                self.projects = self.__parseConfFileSections(ConfMgr.__fallbackPath)
-        else:
-            self.__parseConfFileSections(self.args["--config"])
+                if self.projects is None:
+                    print("WARNING: no config not found, using fallback!!")
+                    self.projects = self.__parseConfFileSections(
+                            ConfMgr.__fallbackPath
+                    )
+            else:
+                self.__parseConfFileSections(self.args["--config"])
+        except FileNotFoundError as e:
+            print(f"ERROR: necessary file '{e}' not available")
+            sys.exit(1)
 
     def __getConfigLocationList(self) -> list[str]:
         """!
@@ -67,10 +73,10 @@ class ConfMgr(object):
 
         @return List[str] where each entry is a filesystem path
         """
-        meta = conf2obj(getConfig(ConfMgr.__fallbackPath), "META")
+        meta = makeDataStruct(getConfig(ConfMgr.__fallbackPath), "META")
         return meta.cfgpaths.replace("\n", "").split(",")
 
-    def __getConfFromList(self, paths: list[str]) -> ConfigStruct | None:
+    def __getConfFromList(self, paths: list[str]) -> DataStruct | None:
         """!
         parses and returns the first config found in the list provided.
         @param paths, list of strings representing the possible places that
@@ -97,7 +103,7 @@ class ConfMgr(object):
         else:
             return False
 
-    def __parseConfFileSections(self, path: str) -> ConfigStruct:
+    def __parseConfFileSections(self, path: str) -> DataStruct:
         """!
         This needs to parse all sections: language section defines which other
         sections exist.
@@ -115,16 +121,16 @@ class ConfMgr(object):
             sys.exit(1)
 
         # Extract the languages
-        langs = conf2obj(config, section="ProGenrtr").languages.split(',')
+        langs = makeDataStruct(config, attribute="ProGenrtr").languages.split(',')
         langs = [s.strip() for s in langs]  # Clean newline characters
-        # Create a dictionary to hold ConfigStructs
+        # Create a dictionary to hold DataStructs
         projects = dict()
 
         for lang in langs:
             if f"project.{lang}" in config:
-                projects[lang] = conf2obj(config, section=f"project.{lang}")
+                projects[lang] = makeDataStruct(config, attribute=f"project.{lang}")
 
-        return ConfigStruct(**projects)
+        return DataStruct(**projects)
 
     def __exitIfFallbackConfigDoesNotExists(self) -> None:
         """!
@@ -132,7 +138,4 @@ class ConfMgr(object):
         exit with an appropriate status code
         """
         if Path(self.__fallbackPath).exists() is False:
-            print(
-                f"ERROR: necessary file '{self.__fallbackPath}' not available"
-            )
-            sys.exit(1)
+            raise FileNotFoundError(self.__fallbackPath)

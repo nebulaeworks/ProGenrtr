@@ -15,6 +15,10 @@ venv:
 test:
 	@pytest -v
 
+.PHONY: validate-config
+validate-config:
+	@pytest -vk TestFallbackConfig
+
 .PHONY: docs
 docs:
-	doxygen docs/Doxyfile
+	doxygen -q docs/Doxyfile
