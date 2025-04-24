@@ -1,13 +1,13 @@
 import pprint, sys
 from ConfigManager import ConfMgr as Config
-from Config import ConfigStruct
+from Config import DataStruct
 
 class ProjectTypesList:
     """!
     handle the listing of project types defined in the application config
     """
 
-    NO_LANG = ConfigStruct(ERROR = "No projects found for language")
+    NO_LANG = DataStruct(ERROR = "No projects found for language")
 
     def run(self, args: dict):
         """!
@@ -20,7 +20,6 @@ class ProjectTypesList:
             self.__print()
         else:
             self.__print(args["--lang"])
-
 
     def __print(self, lang: str = None):
         """!
@@ -41,10 +40,10 @@ class ProjectTypesList:
             except AttributeError as e:
                 sys.exit("ERROR: Language " + str(e))
 
-    def __printProjects(self, language: ConfigStruct):
+    def __printProjects(self, language: DataStruct):
         """!
         print all the projects for a given language
-        @param language a ConfigStruct made up of the projects that are
+        @param language a DataStruct made up of the projects that are
                applicable for a particular programming language.
         """
         for index, (project,source) in enumerate(vars(language).items()):

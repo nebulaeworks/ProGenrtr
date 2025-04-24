@@ -1,24 +1,25 @@
 import configparser
 from pathlib import Path
+from typing import Any
 
 
-class ConfigStruct:
+class DataStruct:
     """!
     data object to access config in a sane manner, essentially a dictionary
     that allows access to its keys as data members.
     """
 
-    def __init__(self, **entries):
-        self.__dict__.update(entries)
+    def __init__(self, **kwargs):
+        self.__dict__.update(kwargs)
 
-    def get(self, attr: str):
+    def get(self, attr: str, default: Any = None) -> Any:
         try:
             return getattr(self, attr)
         except AttributeError:
-            raise AttributeError(f"'{attr}' not found in config")
+            return default
 
-    def __getitem__(self, item: str):
-        return self.get(item)
+    def __getitem__(self, attr: str) -> Any:
+        return self.__dict__[attr]
 
     def __str__(self):
         return str(self.__dict__)
@@ -41,7 +42,7 @@ def getConfig(path: str) -> dict:
     return data
 
 
-def conf2obj(data: dict, section=None):
+def makeDataStruct(data: dict, attribute: str = None):
     """!
     create a ConfigStruct from a parsed config object, either for the file as
     a whole or for a specific section of the config file.
@@ -49,7 +50,7 @@ def conf2obj(data: dict, section=None):
     @param section the section you wish to convert (optional)
     @returns ConfigStruct containg the parsed config values.
     """
-    if section is None:
-        return ConfigStruct(**data)
+    if attribute is None:
+        return DataStruct(**data)
     else:
-        return ConfigStruct(**data[section])
+        return DataStruct(**data[attribute])
