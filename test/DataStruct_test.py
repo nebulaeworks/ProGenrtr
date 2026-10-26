@@ -1,3 +1,8 @@
+"""! @test
+tests of the src.Config.DataStruct class along with its helper
+functions: src.Config.getConfig() and src.Config.makeDataStruct(). Together these
+provide low level (relatively speaking) handling of ini formatted config files.
+"""
 import pytest
 from typing import Any
 from copy import deepcopy
@@ -36,6 +41,20 @@ class testClass:
 
 
 def test_DataStuct_dict_init_handles_standard_primitives() -> None:
+    """! @START_SCENARIO
+    normal instanciation of a DataStruct object requires a dictionary to be
+    passed in as kwargs (see todo for @ref src.Config.DataStruct.__init__()
+    "DataStruct constructor") and results in a DataStruct object that
+    contains all the entries of that dictionary as member properties. Test that
+    this works for all common primitive types.
+    @GIVEN{A dictionary containing any of the following types: str, int, float
+           bool, None}
+    @WHEN{A DataStruct is constructed from this dictionary}
+    @THEN{The dictionary entries are converted to properties of the
+          DataStruct object, where the entry key is the property name and the
+          entry value is the property value}
+    @END_SCENARIO
+    """
     # deepcopy may be unnecessary but this way we dont have to keep track of
     # which vars are which type so if it changes in the future it wont break
     # because of value/reference semantics
@@ -67,6 +86,19 @@ def test_DataStuct_dict_init_handles_standard_primitives() -> None:
 
 
 def test_DataStruct_dict_init_handles_standard_collections() -> None:
+    """! @START_SCENARIO
+    Same as test_DataStuct_dict_init_handles_standard_primitives except for
+    standard python collections. Makes sure that these collections become
+    direct members and that normal operations on those collections act normally
+    @GIVEN{A dictionary containing any of the following types: list, dict,
+           tuple, set}
+    @WHEN{A DataStruct is constructed from this dictionary}
+    @THEN{The collection dictionary entries are converted to properties of the
+          DataStruct object, where the entry key is the property name and the
+          entry value is the actual collection}
+    @AND_T{the collections are still usable as such}
+    @END_SCENARIO
+    """
     expectedH = deepcopy(testClass().varList)
     expectedI = deepcopy(testClass().varDict)
     expectedJ = deepcopy(testClass().varTuple)
@@ -101,6 +133,18 @@ def test_DataStruct_dict_init_handles_standard_collections() -> None:
 
 
 def test_DataStruct_dict_init_handles_custom_types() -> None:
+    """! @START_SCENARIO
+    Same as test_DataStuct_dict_init_handles_standard_primitives except for
+    user defined types; Makes sure that these types can have their properties
+    accessed and functions called.
+    @GIVEN{A dictionary containing a user defined type}
+    @WHEN{A DataStruct is constructed from this dictionary}
+    @THEN{The user defined type is accessible as a direct member of the
+          DataStruct}
+    @AND_T{properties and functions of the userdefined type are accessible
+           callable(respectively)}
+    @END_SCENARIO
+    """
     expectedL: testClass = testClass()
     testDict: dict = {
         "L": expectedL
@@ -114,6 +158,13 @@ def test_DataStruct_dict_init_handles_custom_types() -> None:
 
 
 def test_DataStruct_good_dictionary_access() -> None:
+    """! @START_SCENARIO
+    ensure that dictionary access in a datastruct mirrors the member access
+    @GIVEN{A dictionary (non empty) initialised DataStruct}
+    @WHEN{The DataStruct is accessed using square brackets notation}
+    @THEN{The returned value is the same type and value of the original dict}
+    @END_SCENARIO
+    """
     actual: DataStruct = DataStruct(**testClass().varDict)
     expectedInt: int = deepcopy(testClass().varInt)
     expectedStr: str = deepcopy(testClass().varStr)
@@ -125,6 +176,15 @@ def test_DataStruct_good_dictionary_access() -> None:
 
 
 def test_DataStruct_bad_dictionary_access() -> None:
+    """! @START_SCENARIO
+    ensure that dictionary access in a DataStruct throws appropriately when
+    presented with bad inputs
+    @GIVEN{A dictionary (non empty) initialised DataStruct}
+    @WHEN{The DataStruct is accessed using square brackets notation}
+    @AND_W{The entry being accessed does not exist in the original dictionary}
+    @THEN{A `KeyError` is thrown}
+    @END_SCENARIO
+    """
     actual: DataStruct = DataStruct(**testClass().varDict)
 
     with pytest.raises(KeyError):
@@ -132,6 +192,17 @@ def test_DataStruct_bad_dictionary_access() -> None:
 
 
 def test_DataStruct_good_defaulted_access() -> None:
+    """! @START_SCENARIO
+    ensure that access to DataStruct members via `get()` provides the
+    appropriate result.
+    @GIVEN{A DataStruct initialised with a non empty dictionary}
+    @WHEN{The DataStruct is accessed using the `get()` method}
+    @AND_W{The parameter passed to `get()` corresponds to an entry in the
+           initial dictionary}
+    @THEN{The returned value is of the same type and value as in the initial
+          dictionary}
+    @END_SCENARIO
+    """
     actual: DataStruct = DataStruct(**testClass().varDict)
     expectedInt: int = deepcopy(testClass().varInt)
     expectedStr: str = deepcopy(testClass().varStr)
@@ -143,11 +214,30 @@ def test_DataStruct_good_defaulted_access() -> None:
 
 
 def test_DataStruct_defaulted_access_nonexistant_value_no_default() -> None:
+    """! @START_SCENARIO
+    make sure that when no default parameter value is provided to the `get()`
+    method access to nonexistant entries/members is `None`
+    @GIVEN{A DataStruct}
+    @WHEN{a nonexistant member/entry is accessed with `get()`}
+    @AND_W{no default parameter value is provided}
+    @THEN{The returned value/type is `None`}
+    @END_SCENARIO
+    """
     actual: DataStruct = DataStruct(**testClass().varDict)
     assert actual.get('nonExistantNonsense') is None
 
 
 def test_DataStruct_defaulted_access_nonexistant_value_with_default() -> None:
+    """! @START_SCENARIO
+    make sure that when a default parameter value is provided to the `get()`
+    method, access to nonexistant entries/members is the same type/value as the
+    default value provided.
+    @GIVEN{A DataStruct is accessed with the `get()` method}
+    @AND_G{The entry/member attempting to be accessed does not exist}
+    @WHEN{A value is provided for the `default` parameter}
+    @THEN{The returned value/type is the same as the provided default}
+    @END_SCENARIO
+    """
     actual: DataStruct = DataStruct(**testClass().varDict)
     assert type(actual.get('nonExistantNonsense', "defaultVal")) is type("defaultVal")
     assert actual.get('nonExistantNonsense', "defaultVal") == "defaultVal"
@@ -158,6 +248,12 @@ def test_DataStruct_defaulted_access_nonexistant_value_with_default() -> None:
 
 
 def test_makeDataStruct_works_with_naked_dict() -> None:
+    """! @todo @START_SCENARIO
+    @GIVEN{ }
+    @WHEN{ }
+    @THEN{ }
+    @END_SCENARIO
+    """
     actual: DataStruct = makeDataStruct(testClass().varDict)
     expectedType = DataStruct
 
@@ -167,6 +263,12 @@ def test_makeDataStruct_works_with_naked_dict() -> None:
 
 
 def test_makeDataStruct_can_construct_DataStruct_from_sub_dict() -> None:
+    """! @todo @START_SCENARIO
+    @GIVEN{ }
+    @WHEN{ }
+    @THEN{ }
+    @END_SCENARIO
+    """
     actual: DataStruct = makeDataStruct(testClass().varDict, "subdict")
     expectedType = DataStruct
 

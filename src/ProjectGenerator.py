@@ -22,9 +22,9 @@ class ProjectGenerator:
 
         @param args Dictionary containing command line arguments
                     Expected keys:
-                    - <LANGUAGE>: Programming language of the template
-                    - <PROJECT_TYPE>: Type of project to generate
-                    - <PROJECT_PATH>: Target directory for the new project
+                    - `<LANGUAGE>`: Programming language of the template
+                    - `<PROJECT_TYPE>`: Type of project to generate
+                    - `<PROJECT_PATH>`: Target directory for the new project
         """
         langArg = args["<LANGUAGE>"]
         projectArg = args["<PROJECT_TYPE>"]

@@ -1,0 +1,89 @@
+ALIASES += START_SCENARIO="\
+<div style='border:1px solid #76ce96;\
+            background-color: rgba(204,238,213,0.05);\
+            padding:8px;\
+            border-radius:4px;\
+            margin:6px 0;'>\
+<span style=\"font-weight: bold; color: #76ce96;\">\
+    SCENARIO:\
+</span>"
+ALIASES += END_SCENARIO="</div>"
+# -----------------------------------o   o------------------------------------ #
+#                               GIVEN CONDITIONS                               #
+# -----------------------------------o   o------------------------------------ #
+ALIASES += GIVEN{1}="\
+<div style='border:1px solid #c900ff;\
+            background-color:rgba(33,0,69,0.1);\
+            padding:8px;\
+            border-radius:4px;\
+            margin:6px 0;\
+            border-left:8px solid #c900ff;'>\
+<b style='color:#c900ff;'>GIVEN:</b> \1 </div>"
+
+ALIASES += AND_G{1}="\
+<div style='border:1px solid #c900ff;\
+            background-color:rgba(33,0,69,0.1);\
+            padding:8px;\
+            border-radius:4px;\
+            margin:6px 0;\
+            border-left:8px solid #c900ff;'>\
+<b style='color:#c900ff;'>AND:</b> \1 </div>"
+
+ALIASES += OR_G{1}="\
+<div style='border:1px solid #c900ff;\
+            background-color:rgba(33,0,69,0.1);\
+            padding:8px;\
+            border-radius:4px;\
+            margin:6px 0;\
+            border-left:8px solid #c900ff;'>\
+<b style='color:#c900ff;'>OR:</b> \1 </div>"
+# -----------------------------------o   o------------------------------------ #
+#                                WHEN CONDITIONS                               #
+# -----------------------------------o   o------------------------------------ #
+ALIASES += WHEN{1}="\
+<div style='border:1px solid #ffc500;\
+            background-color:rgba(95,66,4,0.1);\
+            padding:8px;\
+            border-radius:4px;\
+            margin:6px 0;\
+            border-left:8px solid #ffc500;'>\
+<b style='color:#ffc500;'>WHEN:</b> \1 </div>"
+
+ALIASES += AND_W{1}="\
+<div style='border:1px solid #ffc500;\
+            background-color:rgba(95,66,4,0.1);\
+            padding:8px;\
+            border-radius:4px;\
+            margin:6px 0;\
+            border-left:8px solid #ffc500;'>\
+<b style='color:#ffc500;'>AND:</b> \1 </div>"
+
+ALIASES += OR_W{1}="\
+<div style='border:1px solid #ffc500;\
+            background-color:rgba(95,66,4,0.1);\
+            padding:8px;\
+            border-radius:4px;\
+            margin:6px 0;\
+            border-left:8px solid #ffc500;'>\
+<b style='color:#ffc500;'>OR:</b> \1 </div>"
+# -----------------------------------o   o------------------------------------ #
+#                                THEN CONDITIONS                               #
+# -----------------------------------o   o------------------------------------ #
+ALIASES += THEN{1}="\
+<div style='border:1px solid #00f3ff;\
+            background-color:rgba(4,95,92,0.1);\
+            padding:8px;\
+            border-radius:4px;\
+            margin:6px 0;\
+            border-left:8px solid #00f3ff;'>\
+<b style='color:#00f3ff;'>THEN:</b> \1 </div>"
+
+ALIASES += AND_T{1}="\
+<div style='border:1px solid #00f3ff;\
+            background-color:rgba(4,95,92,0.1);\
+            padding:8px;\
+            border-radius:4px;\
+            margin:6px 0;\
+            border-left:8px solid #00f3ff;'>\
+<b style='color:#00f3ff;'>AND:</b> \1 </div>"
+
