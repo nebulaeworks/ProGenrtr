@@ -61,7 +61,7 @@ class ConfMgr(object):
                             ConfMgr.__fallbackPath
                     )
             else:
-                self.__parseConfFileSections(self.args["--config"])
+                self.projects = self.__parseConfFileSections(self.args["--config"])
         except FileNotFoundError as e:
             print(f"ERROR: necessary file '{e}' not available")
             sys.exit(1)
@@ -73,8 +73,15 @@ class ConfMgr(object):
 
         @return List[str] where each entry is a filesystem path
         """
-        meta = makeDataStruct(getConfig(ConfMgr.__fallbackPath), "META")
-        return meta.cfgpaths.replace("\n", "").split(",")
+        try:
+            meta = makeDataStruct(getConfig(ConfMgr.__fallbackPath), "META")
+            return meta.cfgpaths.replace("\n", "").split(",")
+        except KeyError as ke:
+            print(f"ERROR: {ke} missing from '{ConfMgr.__fallbackPath}'")
+            sys.exit(1)
+        except AttributeError as ae:
+            print(f"ERROR: {ae} missing from '{ConfMgr.__fallbackPath}'")
+            sys.exit(1)
 
     def __getConfFromList(self, paths: list[str]) -> DataStruct | None:
         """!
