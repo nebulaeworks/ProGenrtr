@@ -7,7 +7,7 @@ venv:
 		echo 'virtualenv already exists'; \
 		echo 'please `rm -rf venv` and run again.'; \
 	 else \
-	 	virtualenv venv && \
+	 	python -m venv venv && \
 		source venv/bin/activate && \
 		pip install -r requirements.txt; \
 	 fi
